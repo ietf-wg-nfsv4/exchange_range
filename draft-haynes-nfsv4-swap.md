@@ -32,7 +32,7 @@ normative:
 
 informative:
   XFS-EXCHANGE-RANGE:
-    title: ioctl_xfs_exchange_range(2) — Exchange data between files (Accessed January 2026)
+    title: ioctl_xfs_exchange_range(2) - Exchange data between files (Accessed January 2026)
     author:
     - org: Linux man-pages project
       target: https://man7.org/linux/man-pages/man2/ioctl_xfs_exchange_range.2.html
