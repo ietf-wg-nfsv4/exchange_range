@@ -32,14 +32,13 @@ normative:
 
 informative:
   XFS-EXCHANGE-RANGE:
-    title: ioctl_xfs_exchange_range(2) — Exchange data between files
+    title: ioctl_xfs_exchange_range(2) — Exchange data between files (Accessed January 2026)
     author:
     - org: Linux man-pages project
       target: https://man7.org/linux/man-pages/man2/ioctl_xfs_exchange_range.2.html
     date: July 2024
     seriesinfo:
       Linux: "6.10"
-    note: Accessed January 2026
 
 --- abstract
 
@@ -100,7 +99,7 @@ The definitions of the following terms are referenced as follows:
 
 # Operation 81: SWAP - Swap a range of a file into another file
 
-### ARGUMENTS
+## ARGUMENTS
 
 ~~~ xdr
  /// struct SWAP4args {
@@ -115,7 +114,7 @@ The definitions of the following terms are referenced as follows:
 ~~~
 {: #fig-SWAP4args title="XDR for SWAP4args" }
 
-### RESULTS
+## RESULTS
 
 ~~~ xdr
  /// struct SWAP4res {
@@ -124,7 +123,7 @@ The definitions of the following terms are referenced as follows:
 ~~~
 {: #fig-SWAP4res title="XDR for SWAP4res" }
 
-### DESCRIPTION
+## DESCRIPTION
 
 The SWAP operation is used to swap file content from a source file
 specified by the SAVED_FH value into a destination file specified
@@ -244,6 +243,8 @@ This document has no IANA actions.
 
 Christoph Helwig inadvertently pointed out the XFS swap implementation
 ({{XFS-EXCHANGE-RANGE}}) which prompted this document.
+
+David Noveck and Pali Rohar helped review the document.
 
 Chris Inacio, Brian Pawlowski, and Gorry Fairhurst helped guide
 this process.
