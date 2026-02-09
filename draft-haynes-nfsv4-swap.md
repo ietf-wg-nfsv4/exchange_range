@@ -192,6 +192,23 @@ the visibility of intermediate states to server-internal mechanisms.
 
 The completion status of the operation is indicated by sr_status.
 
+The SWAP operation does not require the server to provide exactly-once
+execution semantics.  A server that does not maintain a persistent
+reply cache MAY execute a replayed SWAP operation more than once,
+provided the associated stateids remain valid.
+
+Stateids supplied with the SWAP operation provide protection against
+replay across server reboots, lease expiration, or state revocation.
+After a server reboot, all previously issued stateids are invalidated,
+and replay of a prior SWAP operation MUST fail with an appropriate
+error.
+
+Clients MUST NOT assume that a successfully replayed SWAP operation
+was executed only once. Clients that require confirmation of the
+effects of a SWAP operation MUST validate the resulting file contents
+or metadata, such as via the change attribute, as required for other
+non-idempotent operations in NFSv4.2.
+
 # Operations and Their Valid Errors
 
 The operations and their valid errors are presented in
