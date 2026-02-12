@@ -269,11 +269,11 @@ This document has no IANA actions.
 # Acknowledgments
 {:numbered="false"}
 
-Christoph Helwig inadvertently pointed out the XFS swap implementation
-({{XFS-EXCHANGE-RANGE}}) which prompted this document.
+Christoph Helwig inadvertently pointed out the XFS exchange range
+implementation ({{XFS-EXCHANGE-RANGE}}) which prompted this document.
 
-David Noveck, Pali Rohar, Rick Macklem, and Christoph Helwig helped
-review the document.
+Darrick Wong, David Noveck, Pali Rohar, Rick Macklem, and Christoph
+Helwig helped review the document.
 
 Chris Inacio, Brian Pawlowski, and Gorry Fairhurst helped guide
 this process.
