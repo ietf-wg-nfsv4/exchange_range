@@ -195,7 +195,7 @@ Atomicity is defined with respect to NFSv4.2 READ and WRITE operations
 issued by other clients; the protocol makes no guarantees regarding
 the visibility of intermediate states to server-internal mechanisms.
 
-The completion status of the operation is indicated by sr_status.
+The completion status of the operation is indicated by err_status.
 
 The EXCHANGE_RANGE operation does not require the server to provide
 exactly-once execution semantics.  A server that does not maintain
