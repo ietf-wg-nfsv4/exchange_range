@@ -1,4 +1,4 @@
-# Adding an SWAP Operation to NFSv4.2
+# Adding an EXCHANGE_RANGE Operation to NFSv4.2
 
 This is the working area for the individual Internet-Draft, "Adding an EXCHANGE_RANGE Operation to NFSv4.2".
 
