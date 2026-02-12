@@ -172,11 +172,15 @@ determine the new size of the destination file.  The contents of
 any block not part of the target area will be the same as if the
 file size were extended by a WRITE.
 
-If the area to be swapped is not a multiple of the clone block size
-and the size of the destination file is past the end of the target
-area, the area between the end of the target area and the next
-multiple of the clone block size will be zeroed to ensure deterministic
-file contents.
+If the number of bytes to be swapped is not a multiple of the clone
+block size and sa_dst_offset + sa_count is less than the current
+size of the destination file, the operation MUST fail with
+NFS4ERR_INVAL.
+
+This restriction avoids modifying a portion of a clone block while
+leaving the remainder of that clone block within the destination
+file unchanged, which could otherwise lead to implementation-dependent
+results and potential data integrity issues.
 
 The SWAP operation is atomic in that other operations may not see
 any intermediate states between the state of the two files before
