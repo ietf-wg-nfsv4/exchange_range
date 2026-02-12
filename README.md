@@ -1,11 +1,11 @@
 # Adding an SWAP Operation to NFSv4.2
 
-This is the working area for the individual Internet-Draft, "Adding an SWAP Operation to NFSv4.2".
+This is the working area for the individual Internet-Draft, "Adding an EXCHANGE_RANGE Operation to NFSv4.2".
 
-* [Editor's Copy](https://ietf-wg-nfsv4.github.io/uncacheable/#go.draft-haynes-nfsv4-swap.html)
+* [Editor's Copy](https://ietf-wg-nfsv4.github.io/exchange_range/#go.draft-haynes-nfsv4-swap.html)
 * [Datatracker Page](https://datatracker.ietf.org/doc/draft-haynes-nfsv4-swap)
 * [Individual Draft](https://datatracker.ietf.org/doc/html/draft-haynes-nfsv4-swap)
-* [Compare Editor's Copy to Individual Draft](https://ietf-wg-nfsv4.github.io/swap/#go.draft-haynes-nfsv4-swap.diff)
+* [Compare Editor's Copy to Individual Draft](https://ietf-wg-nfsv4.github.io/exchange_range/#go.draft-haynes-nfsv4-swap.diff)
 
 
 ## Contributing
