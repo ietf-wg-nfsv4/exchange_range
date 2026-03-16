@@ -1,0 +1,7 @@
+/lib
+/node_modules
+/versioned
+.targets.mk
+*.html
+*.txt
+*.xml
