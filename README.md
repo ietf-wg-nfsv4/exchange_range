@@ -1,6 +1,8 @@
-# Adding an EXCHANGE_RANGE Operation to NFSv4.2
+<!-- regenerate: on (set to off if you edit this file) -->
 
-This is the working area for the individual Internet-Draft, "Adding an EXCHANGE_RANGE Operation to NFSv4.2".
+# Adding an Atomic EXCHANGE_RANGE Operation to NFSv4.2
+
+This is the working area for the individual Internet-Draft, "Adding an Atomic EXCHANGE_RANGE Operation to NFSv4.2".
 
 * [Editor's Copy](https://ietf-wg-nfsv4.github.io/exchange_range/#go.draft-haynes-nfsv4-swap.html)
 * [Datatracker Page](https://datatracker.ietf.org/doc/draft-haynes-nfsv4-swap)
@@ -11,11 +13,10 @@ This is the working area for the individual Internet-Draft, "Adding an EXCHANGE_
 ## Contributing
 
 See the
-[guidelines for contributions](https://github.com/ietf-wg-nfsv4/uncacheable/blob/main/CONTRIBUTING.md).
+[guidelines for contributions](https://github.com/ietf-wg-nfsv4/exchange_range/blob/main/CONTRIBUTING.md).
 
-Contributions can be made by creating pull requests.
-The GitHub interface supports creating pull requests using the Edit (✏) button.
-
+The contributing file also has tips on how to make contributions, if you
+don't already know how to do that.
 
 ## Command Line Usage
 

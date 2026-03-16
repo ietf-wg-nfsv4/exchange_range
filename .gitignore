@@ -5,3 +5,5 @@
 *.html
 *.txt
 *.xml
+/lib
+draft-haynes-nfsv4-swap.xml
