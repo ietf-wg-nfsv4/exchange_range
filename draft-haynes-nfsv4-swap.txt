@@ -4,8 +4,8 @@
 
 Network File System Version 4                                  T. Haynes
 Internet-Draft                                               Hammerspace
-Intended status: Standards Track                           16 March 2026
-Expires: 17 September 2026
+Intended status: Standards Track                           30 March 2026
+Expires: 1 October 2026
 
 
           Adding an Atomic EXCHANGE_RANGE Operation to NFSv4.2
@@ -44,7 +44,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 September 2026.
+   This Internet-Draft will expire on 1 October 2026.
 
 Copyright Notice
 
@@ -242,6 +242,9 @@ Table of Contents
    resulting file contents or metadata, such as via the change
    attribute, as required for other non-idempotent operations in
    NFSv4.2.
+
+   As per Section 3.3.1 of [RFC7862], EXCHANGE_RANGE is not an operation
+   which can be sent to a data server.
 
 3.  Operations and Their Valid Errors
 
