@@ -215,6 +215,9 @@ of the effects of a EXCHANGE_RANGE operation MUST validate the
 resulting file contents or metadata, such as via the change attribute,
 as required for other non-idempotent operations in NFSv4.2.
 
+As per Section 3.3.1 of {{RFC7862}}, EXCHANGE_RANGE is not
+an operation which can be sent to a data server.
+
 # Operations and Their Valid Errors
 
 The operations and their valid errors are presented in
