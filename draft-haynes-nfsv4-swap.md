@@ -23,7 +23,6 @@ author:
 normative:
   RFC2119:
   RFC4506:
-  RFC4949:
   RFC7862:
   RFC7863:
   RFC8174:
@@ -76,7 +75,12 @@ operation to NFSv4.2 to atomically apply multiple WRITE operations
 to a file.  A client can easily determine whether or not a server
 supports the EXCHANGE_RANGE operation by examining the return code
 of the operation.  If the server does not support the EXCHANGE_RANGE
-operation, it will return an error of NFS4ERR_NOTSUPP.
+operation, it returns NFS4ERR_NOTSUPP.
+
+Using the process described in {{RFC8178}}, the revisions in this
+document extend NFSv4.2 {{RFC7862}}.  They are built on top of the
+external data representation (XDR) {{RFC4506}} generated from
+{{RFC7863}}.
 
 One way to use the EXCHANGE_RANGE operation is to CLONE a file and
 make modifications to the cloned copy. Once the cloned copy is
@@ -118,8 +122,11 @@ The definitions of the following terms are referenced as follows:
 ## RESULTS
 
 ~~~ xdr
- /// struct EXCHANGE_RANGE4res {
- ///         nfsstat4        err_status;
+ /// union EXCHANGE_RANGE4res switch (nfsstat4 er_status) {
+ ///  case NFS4_OK:
+ ///          void;
+ ///  default:
+ ///          void;
  /// };
 ~~~
 {: #fig-EXCHANGE_RANGE4res title="XDR for EXCHANGE_RANGE4res" }
@@ -136,10 +143,10 @@ SAVED_FH or CURRENT_FH is not a regular file, the operation MUST
 fail and return NFS4ERR_WRONG_TYPE.
 
 The era_dst_stateid MUST refer to a stateid that is valid for a WRITE
-operation and follows the rules for stateids in Sections 8.2.5 of
-{{RFC7862}} and 18.32.3 of {{RFC8881}}.  The era_src_stateid MUST
+operation and follows the rules for stateids in Section 8.2.5 of
+{{RFC7862}} and Section 18.32.3 of {{RFC8881}}.  The era_src_stateid MUST
 refer to a stateid that is valid for a READ operation and follows
-the rules for stateids in Sections 8.2.5 of {{RFC7862}} and 18.22.3
+the rules for stateids in Section 8.2.5 of {{RFC7862}} and Section 18.22.3
 of {{RFC8881}}.  If either stateid is invalid, then the operation
 MUST fail.
 
@@ -148,7 +155,7 @@ from which the data to be exchanged will be obtained, and the
 era_dst_offset is the starting offset of the target region into which
 the exchanged data will be placed.  An offset of 0 (zero) indicates
 the start of the respective file.  The number of bytes to be exchanged
-is obtained from era_count, except that a era_count of 0 (zero)
+is obtained from era_count, except that an era_count of 0 (zero)
 indicates that the number of bytes to be exchanged is the count of
 bytes between era_src_offset and the EOF of the source file.  Both
 era_src_offset and era_dst_offset must be aligned to the clone block
@@ -224,13 +231,47 @@ The operations and their valid errors are presented in
 {{tbl-ops-and-errors}}.  All error codes not defined in this document
 are defined in Section 15 of {{RFC8881}} and Section 11 of {{RFC7862}}.
 
- | Operation            | Errors                                 |
- | ---
- | EXCHANGE_RANGE                 | NFS4ERR_ACCESS, NFS4ERR_ADMIN_REVOKED, NFS4ERR_BADXDR, NFS4ERR_BAD_STATEID, NFS4ERR_DEADSESSION, NFS4ERR_DELAY, NFS4ERR_DELEG_REVOKED, NFS4ERR_DQUOT, NFS4ERR_EXPIRED, NFS4ERR_FBIG, NFS4ERR_FHEXPIRED, NFS4ERR_GRACE, NFS4ERR_INVAL, NFS4ERR_IO, NFS4ERR_ISDIR, NFS4ERR_LOCKED, NFS4ERR_MOVED, NFS4ERR_NOFILEHANDLE, NFS4ERR_NOSPC, NFS4ERR_NOTSUPP, NFS4ERR_OLD_STATEID, NFS4ERR_OPENMODE, NFS4ERR_OP_NOT_IN_SESSION, NFS4ERR_PNFS_IO_HOLE, NFS4ERR_PNFS_NO_LAYOUT, NFS4ERR_REP_TOO_BIG, NFS4ERR_REP_TOO_BIG_TO_CACHE, NFS4ERR_REQ_TOO_BIG, NFS4ERR_RETRY_UNCACHED_REP, NFS4ERR_ROFS, NFS4ERR_SERVERFAULT, NFS4ERR_STALE, NFS4ERR_SYMLINK, NFS4ERR_TOO_MANY_OPS, NFS4ERR_WRONG_TYPE                     |
+EXCHANGE_RANGE:
+
+: NFS4ERR_ACCESS,
+  NFS4ERR_ADMIN_REVOKED,
+  NFS4ERR_BADXDR,
+  NFS4ERR_BAD_STATEID,
+  NFS4ERR_DEADSESSION,
+  NFS4ERR_DELAY,
+  NFS4ERR_DELEG_REVOKED,
+  NFS4ERR_DQUOT,
+  NFS4ERR_EXPIRED,
+  NFS4ERR_FBIG,
+  NFS4ERR_FHEXPIRED,
+  NFS4ERR_GRACE,
+  NFS4ERR_INVAL,
+  NFS4ERR_IO,
+  NFS4ERR_ISDIR,
+  NFS4ERR_LOCKED,
+  NFS4ERR_MOVED,
+  NFS4ERR_NOFILEHANDLE,
+  NFS4ERR_NOSPC,
+  NFS4ERR_NOTSUPP,
+  NFS4ERR_OLD_STATEID,
+  NFS4ERR_OPENMODE,
+  NFS4ERR_OP_NOT_IN_SESSION,
+  NFS4ERR_PNFS_IO_HOLE,
+  NFS4ERR_PNFS_NO_LAYOUT,
+  NFS4ERR_REP_TOO_BIG,
+  NFS4ERR_REP_TOO_BIG_TO_CACHE,
+  NFS4ERR_REQ_TOO_BIG,
+  NFS4ERR_RETRY_UNCACHED_REP,
+  NFS4ERR_ROFS,
+  NFS4ERR_SERVERFAULT,
+  NFS4ERR_STALE,
+  NFS4ERR_SYMLINK,
+  NFS4ERR_TOO_MANY_OPS,
+  NFS4ERR_WRONG_TYPE
 {: #tbl-ops-and-errors title="Operations and Their Valid Errors"}
 
 If the destination file has active pNFS layouts that prevent atomic
-modification of the target range, the server may return an appropriate
+modification of the target range, the server MAY return an appropriate
 pNFS-related error.
 
 # Extraction of XDR
@@ -267,11 +308,30 @@ should be placed in their appropriate sections within the existing XDR.
 
 # Security Considerations
 
-This document imposes no new security considerations to NFSv4.2.
+The EXCHANGE_RANGE operation is subject to the same security
+considerations as other NFSv4.2 operations that modify file data.
+
+The caller MUST have appropriate access to both the source file
+(read access) and the destination file (write access).  Servers
+MUST enforce authorization checks on both filehandles before
+performing the exchange.
+
+Because the server does not guarantee exactly-once execution
+semantics, a replayed EXCHANGE_RANGE operation may be executed
+more than once if the associated stateids remain valid.  Clients
+that require confirmation of the effects of an EXCHANGE_RANGE
+operation MUST validate the resulting file contents or metadata.
+After a server reboot, previously issued stateids are invalidated,
+preventing replay of prior operations across reboots.
 
 # IANA Considerations
 
-This document has no IANA actions.
+IANA is requested to add the following entry to the NFSv4.2
+"Operations" registry:
+
+ | Number | Name            | RFC      |
+ | ---
+ | 81     | EXCHANGE_RANGE  | RFC TBD  |
 
 --- back
 
