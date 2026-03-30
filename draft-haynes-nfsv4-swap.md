@@ -326,12 +326,7 @@ preventing replay of prior operations across reboots.
 
 # IANA Considerations
 
-IANA is requested to add the following entry to the NFSv4.2
-"Operations" registry:
-
- | Number | Name            | RFC      |
- | ---
- | 81     | EXCHANGE_RANGE  | RFC TBD  |
+This document has no IANA actions.
 
 --- back
 
