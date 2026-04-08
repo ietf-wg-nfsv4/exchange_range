@@ -30,6 +30,7 @@ normative:
   RFC8881:
 
 informative:
+  I-D.haynes-nfsv4-flexfiles-v2:
   XFS-EXCHANGE-RANGE:
     title: ioctl_xfs_exchange_range(2) - Exchange data between files (Accessed January 2026)
     author:
@@ -83,12 +84,6 @@ document extend NFSv4.2 {{RFC7862}}.  They are built on top of the
 external data representation (XDR) {{RFC4506}} generated from
 {{RFC7863}}.
 
-One way to use the EXCHANGE_RANGE operation is to CLONE a file and
-make modifications to the cloned copy. Once the cloned copy is
-ready, the EXCHANGE_RANGE operation can be used to atomically
-exchange the modified contents. Upon success, the cloned copy can
-be deleted.
-
 # Definitions
 
 The definitions of the following terms are referenced as follows:
@@ -103,6 +98,77 @@ The definitions of the following terms are referenced as follows:
 # Requirements Language
 
 {::boilerplate bcp14-tagged}
+
+# Use Cases
+
+The EXCHANGE_RANGE operation addresses a class of problems that
+cannot be solved by existing NFSv4.2 operations.  This section
+motivates the operation by contrasting it with a hypothetical
+one-way transfer primitive and then presenting five concrete use
+cases.
+
+Consider an operation called XFER_RANGE that atomically copies
+data from a source range to a destination range -- essentially
+CLONE ({{Section 15.13 of RFC7862}}) with an atomicity guarantee.
+XFER_RANGE would be a useful primitive in its own right for cases
+where one-way data movement is all that is needed.  EXCHANGE_RANGE
+differs from it in one critical respect: EXCHANGE_RANGE atomically
+swaps the contents of both ranges.  Neither range is "the source"
+and neither is "the destination" -- both hold meaningful data
+before the operation and both hold meaningful data after.  The
+following examples illustrate when the distinction matters.
+
+A/B deployment:
+: A server pre-computes version 2 of a dataset into fileB while
+  version 1 remains live in fileA.  At the moment of go-live, the
+  operator wants to atomically swap which file is current.
+  XFER_RANGE(B->A) overwrites fileA and destroys version 1.
+  XFER_RANGE(A->B) does the same in the other direction.  Neither
+  preserves both versions.  EXCHANGE_RANGE atomically swaps the
+  two, leaving version 1 intact in fileB for inspection or rollback.
+
+Checkpoint and restore:
+: A process maintains a live range and a checkpoint range.  A
+  checkpoint is performed by EXCHANGE_RANGE(live, checkpoint): the
+  checkpoint range now holds the saved state and the live range
+  holds what was the checkpoint.  A restore is performed by the
+  identical call.  The self-inverse property means the mechanism
+  for save and restore are the same operation.  XFER_RANGE requires
+  two distinct one-way operations and cannot guarantee that a
+  restore returns exactly what was saved without additional
+  bookkeeping.
+
+Circular log rotation:
+: Segment 0 is being read by consumers; segment 1 has been filled
+  by a writer and is ready to become the new read segment.  Both
+  segments hold valuable data -- neither is scratch space.
+  EXCHANGE_RANGE atomically swaps their roles.  XFER_RANGE(1->0)
+  destroys segment 0's content before readers have finished with it.
+
+Erasure coding stripe rebuild:
+: During a pNFS Flex Files ({{I-D.haynes-nfsv4-flexfiles-v2}})
+  reconstruction, a data server has rebuilt a stripe from parity
+  into a staging buffer.  Both the live stripe and the staging
+  buffer exist and are valid.  EXCHANGE_RANGE atomically promotes
+  the staging buffer to live and moves the old live data into the
+  staging buffer, where it remains available for integrity
+  verification or rollback if the new stripe fails a subsequent
+  check.  XFER_RANGE would overwrite the live stripe before that
+  verification can occur.
+
+Atomic file update via clone-then-swap:
+: This is the case where XFER_RANGE would be sufficient, and it
+  is worth stating clearly.  A client CLONEs a source file to a
+  temporary working copy, modifies the copy, and then wants to
+  atomically publish the result.  XFER_RANGE(temp->source)
+  accomplishes this: the temporary file is discarded and source is
+  updated atomically.  EXCHANGE_RANGE handles this case as well,
+  and adds one benefit: after the swap, the temporary file holds
+  the previous content of source, providing a no-cost rollback
+  path -- invoke EXCHANGE_RANGE again and the original state is
+  restored.  An implementation that does not need rollback can
+  simply discard the old content; one that does need it gets it
+  without additional operations.
 
 # Operation 81: EXCHANGE_RANGE - Exchange a range of a file into another file
 
