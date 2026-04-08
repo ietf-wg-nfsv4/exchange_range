@@ -89,7 +89,7 @@ ready, the EXCHANGE_RANGE operation can be used to atomically
 exchange the modified contents. Upon success, the cloned copy can
 be deleted.
 
-## Definitions
+# Definitions
 
 The definitions of the following terms are referenced as follows:
 
@@ -100,7 +100,7 @@ The definitions of the following terms are referenced as follows:
 - READ ({{Section 18.22 of RFC8881}})
 - WRITE ({{Section 18.32 of RFC8881}})
 
-## Requirements Language
+# Requirements Language
 
 {::boilerplate bcp14-tagged}
 
