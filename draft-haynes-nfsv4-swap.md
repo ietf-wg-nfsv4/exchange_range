@@ -345,7 +345,7 @@ EXCHANGE_RANGE:
   NFS4ERR_SYMLINK,
   NFS4ERR_TOO_MANY_OPS,
   NFS4ERR_WRONG_TYPE
-{: #tbl-ops-and-errors title="Operations and Their Valid Errors"}
+{: #tbl-ops-and-errors}
 
 If the destination file has active pNFS layouts that prevent atomic
 modification of the target range, the server MAY return an appropriate
