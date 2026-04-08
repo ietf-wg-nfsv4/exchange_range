@@ -102,10 +102,10 @@ The definitions of the following terms are referenced as follows:
 # Use Cases
 
 The EXCHANGE_RANGE operation addresses a class of problems that
-cannot be solved by existing NFSv4.2 operations.  This section
-motivates the operation by contrasting it with a hypothetical
-one-way transfer primitive and then presenting five concrete use
-cases.
+cannot be solved without loss of atomicity by existing NFSv4.2
+operations.  This section motivates the operation by contrasting
+it with a hypothetical one-way transfer primitive and then presenting
+five concrete use cases.
 
 Consider an operation called XFER_RANGE that atomically copies
 data from a source range to a destination range -- essentially
@@ -115,8 +115,19 @@ where one-way data movement is all that is needed.  EXCHANGE_RANGE
 differs from it in one critical respect: EXCHANGE_RANGE atomically
 swaps the contents of both ranges.  Neither range is "the source"
 and neither is "the destination" -- both hold meaningful data
-before the operation and both hold meaningful data after.  The
-following examples illustrate when the distinction matters.
+before the operation and both hold meaningful data after. While the
+protocol distinguishes SAVED_FH and CURRENT_FH for access control
+purposes, the semantics of the operation treat both ranges
+symmetrically. The following examples illustrate when the distinction
+matters.
+
+The use cases below share a common requirement: both ranges contain
+valid data before the operation, and both must remain valid after
+the operation, with no externally visible intermediate state.  A
+sequence of one-way operations (e.g., CLONE, WRITE, or a hypothetical
+XFER_RANGE) cannot provide this guarantee, as they either destroy
+one side of the data or introduce a window in which observers may
+see partially updated state.
 
 A/B deployment:
 : A server pre-computes version 2 of a dataset into fileB while
@@ -126,6 +137,9 @@ A/B deployment:
   XFER_RANGE(A->B) does the same in the other direction.  Neither
   preserves both versions.  EXCHANGE_RANGE atomically swaps the
   two, leaving version 1 intact in fileB for inspection or rollback.
+  This example applies when the two versions reside in fixed locations
+  or ranges that cannot be renamed or redirected atomically (e.g.,
+  shared file layouts or range-based consumers).
 
 Checkpoint and restore:
 : A process maintains a live range and a checkpoint range.  A
@@ -143,7 +157,10 @@ Circular log rotation:
   by a writer and is ready to become the new read segment.  Both
   segments hold valuable data -- neither is scratch space.
   EXCHANGE_RANGE atomically swaps their roles.  XFER_RANGE(1->0)
-  destroys segment 0's content before readers have finished with it.
+  destroys segment 0's content before readers have finished with
+  it. In systems with multiple independent readers, coordination
+  is not feasible, and readers must never observe a partially rotated
+  state.
 
 Erasure coding stripe rebuild:
 : During a pNFS Flex Files ({{I-D.haynes-nfsv4-flexfiles-v2}})
@@ -154,7 +171,8 @@ Erasure coding stripe rebuild:
   staging buffer, where it remains available for integrity
   verification or rollback if the new stripe fails a subsequent
   check.  XFER_RANGE would overwrite the live stripe before that
-  verification can occur.
+  verification can occur. This avoids both the need to copy data
+  and any window in which parity and data are inconsistent.
 
 Atomic file update via clone-then-swap:
 : This is the case where XFER_RANGE would be sufficient, and it
@@ -169,6 +187,16 @@ Atomic file update via clone-then-swap:
   restored.  An implementation that does not need rollback can
   simply discard the old content; one that does need it gets it
   without additional operations.
+
+A composition of existing operations (e.g., CLONE followed by WRITE,
+or two XFER_RANGE operations) cannot provide the same guarantees
+as EXCHANGE_RANGE. Such compositions either:
+
+- destroy one side of the data, or
+- expose an intermediate state to other clients, or
+- require external coordination not available at the protocol level.
+
+EXCHANGE_RANGE provides these guarantees as a single atomic operation.
 
 # Operation 81: EXCHANGE_RANGE - Exchange a range of a file into another file
 
