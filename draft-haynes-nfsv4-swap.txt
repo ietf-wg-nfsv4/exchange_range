@@ -63,21 +63,22 @@ Copyright Notice
 Table of Contents
 
    1.  Introduction
-     1.1.  Definitions
-     1.2.  Requirements Language
-   2.  Operation 81: EXCHANGE_RANGE - Exchange a range of a file into
+   2.  Definitions
+   3.  Requirements Language
+   4.  Use Cases
+   5.  Operation 81: EXCHANGE_RANGE - Exchange a range of a file into
            another file
-     2.1.  ARGUMENTS
-     2.2.  RESULTS
-     2.3.  DESCRIPTION
-     2.4.  ERRORS
-   3.  Operations and Their Valid Errors
-   4.  Extraction of XDR
-   5.  Security Considerations
-   6.  IANA Considerations
-   7.  References
-     7.1.  Normative References
-     7.2.  Informative References
+     5.1.  ARGUMENTS
+     5.2.  RESULTS
+     5.3.  DESCRIPTION
+     5.4.  ERRORS
+   6.  Operations and Their Valid Errors
+   7.  Extraction of XDR
+   8.  Security Considerations
+   9.  IANA Considerations
+   10. References
+     10.1.  Normative References
+     10.2.  Informative References
    Acknowledgments
    Author's Address
 
@@ -105,13 +106,7 @@ Table of Contents
    external data representation (XDR) [RFC4506] generated from
    [RFC7863].
 
-   One way to use the EXCHANGE_RANGE operation is to CLONE a file and
-   make modifications to the cloned copy.  Once the cloned copy is
-   ready, the EXCHANGE_RANGE operation can be used to atomically
-   exchange the modified contents.  Upon success, the cloned copy can be
-   deleted.
-
-1.1.  Definitions
+2.  Definitions
 
    The definitions of the following terms are referenced as follows:
 
@@ -127,7 +122,7 @@ Table of Contents
 
    *  WRITE (Section 18.32 of [RFC8881])
 
-1.2.  Requirements Language
+3.  Requirements Language
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
@@ -135,10 +130,76 @@ Table of Contents
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-2.  Operation 81: EXCHANGE_RANGE - Exchange a range of a file into
+4.  Use Cases
+
+   The EXCHANGE_RANGE operation addresses a class of problems that
+   cannot be solved by existing NFSv4.2 operations.  This section
+   motivates the operation by contrasting it with a hypothetical one-way
+   transfer primitive and then presenting five concrete use cases.
+
+   Consider an operation called XFER_RANGE that atomically copies data
+   from a source range to a destination range -- essentially CLONE
+   (Section 15.13 of [RFC7862]) with an atomicity guarantee.  XFER_RANGE
+   would be a useful primitive in its own right for cases where one-way
+   data movement is all that is needed.  EXCHANGE_RANGE differs from it
+   in one critical respect: EXCHANGE_RANGE atomically swaps the contents
+   of both ranges.  Neither range is "the source" and neither is "the
+   destination" -- both hold meaningful data before the operation and
+   both hold meaningful data after.  The following examples illustrate
+   when the distinction matters.
+
+   A/B deployment:  A server pre-computes version 2 of a dataset into
+      fileB while version 1 remains live in fileA.  At the moment of go-
+      live, the operator wants to atomically swap which file is current.
+      XFER_RANGE(B->A) overwrites fileA and destroys version 1.
+      XFER_RANGE(A->B) does the same in the other direction.  Neither
+      preserves both versions.  EXCHANGE_RANGE atomically swaps the two,
+      leaving version 1 intact in fileB for inspection or rollback.
+
+   Checkpoint and restore:  A process maintains a live range and a
+      checkpoint range.  A checkpoint is performed by
+      EXCHANGE_RANGE(live, checkpoint): the checkpoint range now holds
+      the saved state and the live range holds what was the checkpoint.
+      A restore is performed by the identical call.  The self-inverse
+      property means the mechanism for save and restore are the same
+      operation.  XFER_RANGE requires two distinct one-way operations
+      and cannot guarantee that a restore returns exactly what was saved
+      without additional bookkeeping.
+
+   Circular log rotation:  Segment 0 is being read by consumers; segment
+      1 has been filled by a writer and is ready to become the new read
+      segment.  Both segments hold valuable data -- neither is scratch
+      space.  EXCHANGE_RANGE atomically swaps their roles.
+      XFER_RANGE(1->0) destroys segment 0's content before readers have
+      finished with it.
+
+   Erasure coding stripe rebuild:  During a pNFS Flex Files
+      ([I-D.haynes-nfsv4-flexfiles-v2]) reconstruction, a data server
+      has rebuilt a stripe from parity into a staging buffer.  Both the
+      live stripe and the staging buffer exist and are valid.
+      EXCHANGE_RANGE atomically promotes the staging buffer to live and
+      moves the old live data into the staging buffer, where it remains
+      available for integrity verification or rollback if the new stripe
+      fails a subsequent check.  XFER_RANGE would overwrite the live
+      stripe before that verification can occur.
+
+   Atomic file update via clone-then-swap:  This is the case where
+      XFER_RANGE would be sufficient, and it is worth stating clearly.
+      A client CLONEs a source file to a temporary working copy,
+      modifies the copy, and then wants to atomically publish the
+      result.  XFER_RANGE(temp->source) accomplishes this: the temporary
+      file is discarded and source is updated atomically.
+      EXCHANGE_RANGE handles this case as well, and adds one benefit:
+      after the swap, the temporary file holds the previous content of
+      source, providing a no-cost rollback path -- invoke EXCHANGE_RANGE
+      again and the original state is restored.  An implementation that
+      does not need rollback can simply discard the old content; one
+      that does need it gets it without additional operations.
+
+5.  Operation 81: EXCHANGE_RANGE - Exchange a range of a file into
     another file
 
-2.1.  ARGUMENTS
+5.1.  ARGUMENTS
 
     /// const OP_EXCHANGE_RANGE = 81;
     ///
@@ -154,7 +215,7 @@ Table of Contents
 
                    Figure 1: XDR for EXCHANGE_RANGE4args
 
-2.2.  RESULTS
+5.2.  RESULTS
 
     /// struct EXCHANGE_RANGE4resok {
     ///         change_info4    err_src_cinfo;
@@ -183,7 +244,7 @@ Table of Contents
 
            Figure 3: Dispatch union case arms for EXCHANGE_RANGE
 
-2.3.  DESCRIPTION
+5.3.  DESCRIPTION
 
    The EXCHANGE_RANGE operation is used to exchange file content from a
    source file specified by the SAVED_FH value into a destination file
@@ -307,10 +368,10 @@ Table of Contents
    Per Section 3.3.1 of [RFC7862], EXCHANGE_RANGE is not an operation
    which can be sent to a data server.
 
-2.4.  ERRORS
+5.4.  ERRORS
 
    The EXCHANGE_RANGE operation returns the full set of errors defined
-   in Section 3, Paragraph 2.  The following errors are specific to this
+   in Section 6, Paragraph 2.  The following errors are specific to this
    operation:
 
    NFS4ERR_WRONG_TYPE:  Either SAVED_FH or CURRENT_FH is not a regular
@@ -332,9 +393,9 @@ Table of Contents
    NFS4ERR_LOCKED:  A conflicting byte-range lock on the source or
       destination range prevents the exchange.
 
-3.  Operations and Their Valid Errors
+6.  Operations and Their Valid Errors
 
-   The operations and their valid errors are presented in Section 3,
+   The operations and their valid errors are presented in Section 6,
    Paragraph 2.  All error codes not defined in this document are
    defined in Section 15 of [RFC8881] and Section 11 of [RFC7862].
 
@@ -356,7 +417,7 @@ Table of Contents
    modification of the target range, the server MAY return an
    appropriate pNFS-related error.
 
-4.  Extraction of XDR
+7.  Extraction of XDR
 
    This document contains the external data representation (XDR)
    [RFC4506] description of the EXCHANGE_RANGE operation.  The XDR
@@ -385,7 +446,7 @@ Table of Contents
    snippets should be placed in their appropriate sections within the
    existing XDR.
 
-5.  Security Considerations
+8.  Security Considerations
 
    The EXCHANGE_RANGE operation is subject to the same security
    considerations as other NFSv4.2 operations that modify file data.
@@ -412,13 +473,13 @@ Table of Contents
    confirm a single net execution.  Comparing only cinfo_after is
    insufficient for this purpose.
 
-6.  IANA Considerations
+9.  IANA Considerations
 
    This document has no IANA actions.
 
-7.  References
+10.  References
 
-7.1.  Normative References
+10.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -451,7 +512,14 @@ Table of Contents
               DOI 10.17487/RFC8881, August 2020,
               <https://www.rfc-editor.org/rfc/rfc8881>.
 
-7.2.  Informative References
+10.2.  Informative References
+
+   [I-D.haynes-nfsv4-flexfiles-v2]
+              Haynes, T., "Parallel NFS (pNFS) Flexible File Layout
+              Version 2", Work in Progress, Internet-Draft, draft-
+              haynes-nfsv4-flexfiles-v2-03, 27 March 2026,
+              <https://datatracker.ietf.org/doc/html/draft-haynes-nfsv4-
+              flexfiles-v2-03>.
 
    [XFS-EXCHANGE-RANGE]
               Linux man-pages project, "ioctl_xfs_exchange_range(2) -
