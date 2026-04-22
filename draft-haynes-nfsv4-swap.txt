@@ -4,8 +4,8 @@
 
 Network File System Version 4                                  T. Haynes
 Internet-Draft                                               Hammerspace
-Intended status: Standards Track                            8 April 2026
-Expires: 10 October 2026
+Intended status: Standards Track                           22 April 2026
+Expires: 24 October 2026
 
 
           Adding an Atomic EXCHANGE_RANGE Operation to NFSv4.2
@@ -44,7 +44,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 October 2026.
+   This Internet-Draft will expire on 24 October 2026.
 
 Copyright Notice
 
@@ -559,7 +559,7 @@ Table of Contents
 
 Acknowledgments
 
-   Christoph Helwig brought the XFS exchange range implementation
+   Christoph Hellwig brought the XFS exchange range implementation
    ([XFS-EXCHANGE-RANGE]) to the author's attention, which prompted this
    document.
 
