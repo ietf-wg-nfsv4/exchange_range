@@ -513,7 +513,7 @@ This document has no IANA actions.
 # Acknowledgments
 {:numbered="false"}
 
-Christoph Helwig brought the XFS exchange range implementation
+Christoph Hellwig brought the XFS exchange range implementation
 ({{XFS-EXCHANGE-RANGE}}) to the author's attention, which prompted
 this document.
 
