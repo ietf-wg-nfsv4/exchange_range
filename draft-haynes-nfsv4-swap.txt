@@ -4,8 +4,8 @@
 
 Network File System Version 4                                  T. Haynes
 Internet-Draft                                               Hammerspace
-Intended status: Standards Track                            22 July 2026
-Expires: 23 January 2027
+Intended status: Standards Track                       15 September 2026
+Expires: 19 March 2027
 
 
           Adding an Atomic EXCHANGE_RANGE Operation to NFSv4.2
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 January 2027.
+   This Internet-Draft will expire on 19 March 2027.
 
 Copyright Notice
 
@@ -466,7 +466,8 @@ Table of Contents
    [RFC4506] description of the EXCHANGE_RANGE operation.  The XDR
    description is presented in a manner that facilitates easy extraction
    into a ready-to-compile format.  To extract the machine-readable XDR
-   description, use the following shell script:
+   description, use the following shell script, which relies on the sh,
+   grep, and sed utilities as specified by [POSIX]:
 
    #!/bin/sh
    grep '^ *///' $* | sed 's?^ */// ??' | sed 's?^ *///$??'
@@ -560,9 +561,14 @@ Table of Contents
    [I-D.haynes-nfsv4-flexfiles-v2]
               Haynes, T., "Parallel NFS (pNFS) Flexible File Layout
               Version 2", Work in Progress, Internet-Draft, draft-
-              haynes-nfsv4-flexfiles-v2-06, 25 May 2026,
+              haynes-nfsv4-flexfiles-v2-08, 7 August 2026,
               <https://datatracker.ietf.org/doc/html/draft-haynes-nfsv4-
-              flexfiles-v2-06>.
+              flexfiles-v2-08>.
+
+   [POSIX]    IEEE and The Open Group, "IEEE Standard for Information
+              Technology--Portable Operating System Interface (POSIX)
+              Base Specifications, Issue 8", IEEE Std 1003.1-2024, 2024,
+              <https://standards.ieee.org/ieee/1003.1/7700/>.
 
    [XFS-EXCHANGE-RANGE]
               Linux man-pages project, "ioctl_xfs_exchange_range(2) -
