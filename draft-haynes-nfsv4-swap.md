@@ -38,6 +38,15 @@ normative:
   RFC8881:
 
 informative:
+  POSIX:
+    title: "IEEE Standard for Information Technology--Portable Operating System Interface (POSIX) Base Specifications, Issue 8"
+    author:
+    - org: IEEE
+    - org: The Open Group
+    seriesinfo:
+      IEEE: Std 1003.1-2024
+    date: 2024
+    target: https://standards.ieee.org/ieee/1003.1/7700/
   I-D.haynes-nfsv4-flexfiles-v2:
   XFS-EXCHANGE-RANGE:
     title: ioctl_xfs_exchange_range(2) - Exchange data between files (Accessed January 2026)
@@ -454,7 +463,8 @@ This document contains the external data representation (XDR)
 {{RFC4506}} description of the EXCHANGE_RANGE operation.  The XDR
 description is presented in a manner that facilitates easy extraction
 into a ready-to-compile format. To extract the machine-readable XDR
-description, use the following shell script:
+description, use the following shell script, which relies on the sh, grep,
+and sed utilities as specified by {{POSIX}}:
 
 ~~~ shell
 #!/bin/sh
